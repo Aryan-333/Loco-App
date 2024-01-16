@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,20 +7,56 @@ import {
   Button,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const Signup = () => {
   const navigation = useNavigation();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [age, setAge] = useState("");
 
+  const submitSignup = async () => {
+    const apiUrl = "https://api.apptask.thekaspertech.com/api/users/register";
+
+    // Validate form inputs
+    if (!name || !email || !password || !age) {
+      console.error("Please fill out all fields");
+      return;
+    }
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          age,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log("Signup successful:", result);
+
+        navigation.navigate("Profile");
+      } else {
+        console.error("Signup failed:", result);
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+    }
+  };
   const goToLogin = () => {
     navigation.navigate("Login");
-  };
-
-  const submitSignup = () => {
-    // Add logic for signup submission
-    navigation.navigate("Profile");
   };
 
   return (
@@ -59,12 +95,16 @@ const Signup = () => {
               style={styles.textInput}
               placeholder="Name"
               placeholderTextColor="black"
+              value={name}
+              onChangeText={(text) => setName(text)}
             />
 
             <TextInput
               style={styles.textInput}
               placeholder="Email"
               placeholderTextColor="black"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
             />
 
             <TextInput
@@ -72,6 +112,8 @@ const Signup = () => {
               placeholder="Password"
               secureTextEntry={true}
               placeholderTextColor="black"
+              value={password}
+              onChangeText={(text) => setPassword(text)}
             />
 
             <TextInput
@@ -79,6 +121,8 @@ const Signup = () => {
               placeholder="Age"
               keyboardType="numeric"
               placeholderTextColor="black"
+              value={age}
+              onChangeText={(text) => setAge(text)}
             />
           </View>
           <View>
@@ -91,7 +135,6 @@ const Signup = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     // Adjust flex direction, justifyContent, alignItems as needed

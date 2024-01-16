@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -13,14 +13,39 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 const Login = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
+  const submitLogin = async () => {
+    const apiUrl = "https://api.apptask.thekaspertech.com/api/users/login";
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log("Login successful:", result);
+        // Redirect to Profile screen or perform necessary actions
+        navigation.navigate("Profile");
+      } else {
+        console.error("Login failed:", result);
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
+  };
   const goToSignup = () => {
     navigation.navigate("Signup");
-  };
-
-  const submitLogin = () => {
-    // Add logic for login submission
-    navigation.navigate("Profile");
   };
 
   return (
@@ -49,6 +74,8 @@ const Login = () => {
               style={styles.textInput}
               placeholder="Email"
               placeholderTextColor="black"
+              value={email}
+              onChangeText={(text) => setEmail(text)}
             />
 
             <TextInput
@@ -56,6 +83,8 @@ const Login = () => {
               placeholder="Password"
               secureTextEntry={true}
               placeholderTextColor="black"
+              value={password}
+              onChangeText={(text) => setPassword(text)}
             />
           </View>
           <View>

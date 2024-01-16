@@ -1,54 +1,90 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 const Profile = () => {
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "https://api.apptask.thekaspertech.com/api/users/",
+          {
+            headers: {
+              "x-auth-token":
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODA4MWExZTlkZWVkMWMzYjZiNjQ1NSIsImlhdCI6MTcwMjkyMDY0OH0.O4uvWXHiLiWv3Qey0erXjRiZOXcq69cnfN0-JpnFSIw",
+            },
+          }
+        );
+        const data = await response.json();
+
+        if (response.ok) {
+          setProfileData(data);
+        } else {
+          console.error("Failed to fetch profile data:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <View style={styles.container}>
       <Image
         source={require("../assets/Sally.png")}
         style={styles.profileImage}
       />
-      <Text style={styles.name}>Sally Robins</Text>
-      <View style={styles.citybox}>
-        <FontAwesome name="location-arrow" size={16} color="black" />
-        <Text style={styles.city}>New York City</Text>
-      </View>
+      {profileData ? (
+        <>
+          <Text style={styles.name}>{`Name: ${profileData.name}`}</Text>
+          <View style={styles.citybox}>
+            <FontAwesome name="location-arrow" size={16} color="black" />
+            <Text style={styles.city}>New York City</Text>
+          </View>
 
-      <View style={styles.infoBox}>
-        <View style={styles.innerBox}>
-          <View style={styles.innb}>
-            <Text style={styles.email}>sally@gmail.com</Text>
-            <Text style={styles.age}>32</Text>
+          <View style={styles.infoBox}>
+            <View style={styles.innerBox}>
+              <View style={styles.innb}>
+                <Text style={styles.email}>
+                  s{`Email: ${profileData.email}`}
+                </Text>
+                <Text style={styles.age}>{`Age: ${profileData.age}`}</Text>
+              </View>
+              <View style={styles.innb}>
+                <Text style={styles.email1}>EMAIL</Text>
+                <Text style={styles.age1}>AGE</Text>
+              </View>
+            </View>
           </View>
-          <View style={styles.innb}>
-            <Text style={styles.email1}>EMAIL</Text>
-            <Text style={styles.age1}>AGE</Text>
-          </View>
-        </View>
-      </View>
 
-      <Text style={styles.subHeading}>General Statistics</Text>
+          <Text style={styles.subHeading}>General Statistics</Text>
 
-      <View style={styles.fieldsContainer}>
-        <View style={styles.field}>
-          <Text style={styles.fieldLabel}>Places Visited</Text>
-          <View style={styles.textBox}>
-            <Text style={styles.fieldValue}>5</Text>
+          <View style={styles.fieldsContainer}>
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Places Visited</Text>
+              <View style={styles.textBox}>
+                <Text style={styles.fieldValue}>5</Text>
+              </View>
+            </View>
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Hours Travelled</Text>
+              <View style={styles.textBox}>
+                <Text style={styles.fieldValue}>18</Text>
+              </View>
+            </View>
+            <View style={styles.field}>
+              <Text style={styles.fieldLabel}>Surveys Completed</Text>
+              <View style={styles.textBox}>
+                <Text style={styles.fieldValue}>9</Text>
+              </View>
+            </View>
           </View>
-        </View>
-        <View style={styles.field}>
-          <Text style={styles.fieldLabel}>Hours Travelled</Text>
-          <View style={styles.textBox}>
-            <Text style={styles.fieldValue}>18</Text>
-          </View>
-        </View>
-        <View style={styles.field}>
-          <Text style={styles.fieldLabel}>Surveys Completed</Text>
-          <View style={styles.textBox}>
-            <Text style={styles.fieldValue}>9</Text>
-          </View>
-        </View>
-      </View>
+        </>
+      ) : (
+        <Text>Loading profile data...</Text>
+      )}
     </View>
   );
 };
